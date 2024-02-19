@@ -56,12 +56,14 @@ const heavy_craft = async (thing1, thing2) => {
   return result;
 }
 
+const weight_map_fn = weight => (Math.pow(weight, 1.9) / 5.3)
+
 const weighted_random = item_weights => {
   if(!Array.isArray(item_weights) || item_weights.length === 0)
     throw new Error('item_weights must be a valid array of non-zero length');
   const cumulativeWeights = [];
   for(const [_, weight] of item_weights)
-    cumulativeWeights.push((weight * 100) + (cumulativeWeights.at(-1) ?? 0));
+    cumulativeWeights.push((weight_map_fn(weight) * 100) + (cumulativeWeights.at(-1) ?? 0));
   const random_number = Math.random() * cumulativeWeights.at(-1);
   for(let i = 0; i < item_weights.length; i++)
     if(cumulativeWeights[i] >= random_number) return item_weights[i][0];
@@ -96,7 +98,7 @@ while(true) {
     items.push(item);
     item_weights.popularity.set(item, 10); // Set it high, so that it's more likely to be tested out quickly to determine if it's good
     if(e1_pop - e2_pop > 5) {
-      e1_pop *= 1.3;
+      e1_pop *= 1.2;
       e2_pop *= 1.05;
     } else if(e1_pop - e2_pop > 3) {
       e1_pop *= 1.2;
