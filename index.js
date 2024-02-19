@@ -52,7 +52,7 @@ const heavy_craft = async (thing1, thing2) => {
   console.info(log_message);
   await append_log_entry(log_message);
   combinations.set(key, result);
-  await sleep(500 + Math.random() * 300);
+  await sleep(200 + Math.random() * 50);
   return result;
 }
 
@@ -84,7 +84,7 @@ while(true) {
   if(items.includes(item)) {
     if(e1_pop - e2_pop > 5) {
       e1_pop *= 0.95;
-      e2_pop *= 0.8;
+      e2_pop *= 0.7;
     } else if(e1_pop - e2_pop > 3) {
       e1_pop *= 0.9;
       e2_pop *= 0.8;
@@ -96,14 +96,14 @@ while(true) {
     items.push(item);
     item_weights.popularity.set(item, 10); // Set it high, so that it's more likely to be tested out quickly to determine if it's good
     if(e1_pop - e2_pop > 5) {
-      e1_pop *= 1.05;
-      e2_pop *= 1.2;
-    } else if(e1_pop - e2_pop > 3) {
-      e1_pop *= 1.1;
-      e2_pop *= 1.25;
-    } else {
-      e1_pop *= 1.05;
+      e1_pop *= 1.3;
       e2_pop *= 1.05;
+    } else if(e1_pop - e2_pop > 3) {
+      e1_pop *= 1.2;
+      e2_pop *= 1.05;
+    } else {
+      e1_pop *= 1.08;
+      e2_pop *= 1.08;
     }
   }
   item_weights.popularity.set(e1, Math.min(e1_pop, 20));
