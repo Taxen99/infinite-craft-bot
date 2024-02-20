@@ -52,7 +52,7 @@ const heavy_craft = async (thing1, thing2) => {
   console.info(log_message);
   await append_log_entry(log_message);
   combinations.set(key, result);
-  await sleep(200 + Math.random() * 50);
+  await sleep(300 + Math.random() * 50);
   return result;
 }
 
@@ -73,7 +73,7 @@ const item_weights = {
   popularity: new Map(items.map(item => [item, 3])),
 };
 while(true) {
-  console.log([...item_weights.popularity.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5));
+  console.log([...item_weights.popularity.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15));
   let e1 = weighted_random([...item_weights.popularity.entries()]);
   let e2 = pick_from_array(items); // FIXME: ONLY PICK THINGS THAT HAVEN'T BEEN TRIED YET!!!!
   if(item_weights.popularity.get(e2) > item_weights.popularity.get(e1))
