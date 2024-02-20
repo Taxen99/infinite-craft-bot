@@ -103,18 +103,21 @@ const add_weight = (weights, key, constraint = DEFAULT_CONSTRAINT) => {
 
 const DEFAULT_CONSTRAINT = 100;
 const change_weight = (weights, key, inc, constraint = DEFAULT_CONSTRAINT) => {
+  // let OLD_DEBUG___ = structuredClone(weights);
   assert(weights.has(key));
   let total_popularity = map_sum(weights);
   const old = weights.get(key);
   const new_weight = Math.min(old + inc, constraint); // FIXME: fix
   const delta = new_weight - old;
+  if(delta < 0.01)
+    return old;
   for (const [key_, value] of weights.entries()) {
     weights.set(key_, value - (value * (delta / (total_popularity - old))));
   }
   weights.set(key, new_weight);
   total_popularity = map_sum(weights); // FIXME: remove
   if (!(Math.abs(total_popularity - constraint) < 0.01)) {
-    console.log('BAD', weights, old, new_weight, delta, total_popularity, weights);
+    console.log('BAD'/*, OLD_DEBUG___*/, weights, old, new_weight, delta, total_popularity, weights);
   }
   assert(Math.abs(total_popularity - constraint) < 0.01);
   return new_weight;
@@ -138,40 +141,38 @@ while(true) {
   if(item_weights.popularity.get(e2) > item_weights.popularity.get(e1))
     [e1, e2] = [e2, e1]; // e1 should always be more "popular"
   const item = await heavy_craft(e1, e2);
-  if(item === 'Nothing' || !item)
-    continue;
   let e1_pop = item_weights.popularity.get(e1);
   let e2_pop = item_weights.popularity.get(e2);
   const old_e1_pop = e1_pop; // FIXME: this ols system is shit
   const old_e2_pop = e2_pop;
-  if(items.includes(item)) {
+  if (items.includes(item) || item === 'Nothing' || !item) {
     if(e1_pop - e2_pop > 5) {
-      e1_pop *= 0.95;
-      e2_pop *= 0.7;
+      e1_pop -= 0.9;
+      e2_pop *= 0.5;
     } else if(e1_pop - e2_pop > 3) {
-      e1_pop *= 0.9;
-      e2_pop *= 0.8;
+      e1_pop *= 0.7;
+      e2_pop *= 0.6;
     } else {
-      e1_pop *= 0.8;
-      e2_pop *= 0.8;
+      e1_pop *= 0.6;
+      e2_pop *= 0.6;
     }
   } else {
     items.push(item);
     // item_weights.popularity.set(item, 10); // Set it high, so that it's more likely to be tested out quickly to determine if it's good
     add_weight(item_weights.popularity, item);
     if(e1_pop - e2_pop > 5) {
-      e1_pop *= 1.2;
-      e2_pop *= 1.05;
+      e1_pop *= 2;
+      e2_pop *= 1.1;
     } else if(e1_pop - e2_pop > 3) {
-      e1_pop *= 1.2;
-      e2_pop *= 1.05;
+      e1_pop *= 1.4;
+      e2_pop *= 1.1;
     } else {
-      e1_pop *= 1.08;
-      e2_pop *= 1.08;
+      e1_pop *= 1.3;
+      e2_pop *= 1.3;
     }
   }
   // item_weights.popularity.set(e1, Math.min(e1_pop, 20));
   // item_weights.popularity.set(e2, Math.min(e2_pop, 20));
-  change_weight(item_weights.popularity, e1, e1_pop - old_e1_pop);
-  change_weight(item_weights.popularity, e1, e2_pop - old_e2_pop);
+  change_weight(item_weights.popularity, e1, Math.min(e1_pop, 50) - old_e1_pop);
+  change_weight(item_weights.popularity, e1, Math.min(e2_pop, 50) - old_e2_pop);
 }
